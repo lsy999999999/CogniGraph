@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CogniGraph - 知识图谱可视化系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-dark bg-primary navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-diagram-3"></i> CogniGraph 知识图谱可视化
+            </a>
+            <span class="navbar-text text-white">
+                基于词向量的语义空间构建
+            </span>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- 左侧控制面板 -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-sliders"></i> 控制面板
+                    </div>
+                    <div class="card-body">
+                        <!-- 步骤1: 上传文件 -->
+                        <div class="step-section" id="step1">
+                            <h6 class="text-primary">
+                                <span class="step-number">1</span> 上传文本文件
+                            </h6>
+                            <div class="mb-3">
+                                <input type="file" class="form-control" id="fileInput" accept=".txt">
+                                <small class="text-muted">支持 .txt 格式</small>
+                            </div>
+                            <button class="btn btn-primary w-100" id="uploadBtn" disabled>
+                                <i class="bi bi-upload"></i> 上传
+                            </button>
+                            <div id="uploadStatus" class="mt-2"></div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 步骤2: 构建图谱 -->
+                        <div class="step-section" id="step2">
+                            <h6 class="text-primary">
+                                <span class="step-number">2</span> 构建知识图谱
+                            </h6>
+                            <button class="btn btn-success w-100" id="buildBtn" disabled>
+                                <i class="bi bi-gear"></i> 开始构建
+                            </button>
+                            <div id="buildStatus" class="mt-2"></div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 步骤3: 可视化选项 -->
+                        <div class="step-section" id="step3">
+                            <h6 class="text-primary">
+                                <span class="step-number">3</span> 选择可视化方式
+                            </h6>
+
+                            <div class="mb-3">
+                                <label class="form-label">可视化类型</label>
+                                <select class="form-select" id="vizType" disabled>
+                                    <option value="interactive_2d">交互式2D图谱</option>
+                                    <option value="interactive_3d">交互式3D图谱</option>
+                                    <option value="heatmap">语义相似度热力图</option>
+                                    <option value="wordcloud">实体词云</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" id="layoutOptions">
+                                <label class="form-label">布局算法</label>
+                                <select class="form-select" id="layoutType">
+                                    <option value="semantic">语义布局(词向量)</option>
+                                    <option value="spring">力导向布局</option>
+                                    <option value="circular">环形布局</option>
+                                    <option value="kamada_kawai">Kamada-Kawai</option>
+                                    <option value="spectral">谱布局</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-info w-100" id="visualizeBtn" disabled>
+                                <i class="bi bi-eye"></i> 生成可视化
+                            </button>
+                            <div id="vizStatus" class="mt-2"></div>
+                        </div>
+
+                        <hr>
+
+                        <!-- 步骤4: 图谱分析 -->
+                        <div class="step-section" id="step4">
+                            <h6 class="text-primary">
+                                <span class="step-number">4</span> 图谱分析
+                            </h6>
+                            <button class="btn btn-warning w-100" id="analyzeBtn" disabled>
+                                <i class="bi bi-graph-up"></i> 分析图谱
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图例 -->
+                <div class="card mt-3">
+                    <div class="card-header bg-secondary text-white">
+                        <i class="bi bi-palette"></i> 图例
+                    </div>
+                    <div class="card-body">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #3498db;"></span>
+                            人物
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #2ecc71;"></span>
+                            组织
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #e74c3c;"></span>
+                            地点
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #f39c12;"></span>
+                            事件
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #95a5a6;"></span>
+                            概念
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧主内容区 -->
+            <div class="col-md-9">
+                <!-- Tab导航 -->
+                <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="viz-tab" data-bs-toggle="tab" data-bs-target="#vizPanel" type="button">
+                            <i class="bi bi-diagram-3"></i> 可视化
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#infoPanel" type="button">
+                            <i class="bi bi-info-circle"></i> 图谱信息
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analyticsPanel" type="button">
+                            <i class="bi bi-graph-up"></i> 分析结果
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="mainTabContent">
+                    <!-- 可视化面板 -->
+                    <div class="tab-pane fade show active" id="vizPanel" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="visualizationContainer" class="text-center p-5">
+                                    <i class="bi bi-diagram-3" style="font-size: 4rem; color: #ccc;"></i>
+                                    <p class="text-muted mt-3">请按照左侧步骤上传文件并构建知识图谱</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 图谱信息面板 -->
+                    <div class="tab-pane fade" id="infoPanel" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="infoContainer">
+                                    <p class="text-muted">暂无图谱信息</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 分析结果面板 -->
+                    <div class="tab-pane fade" id="analyticsPanel" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="analyticsContainer">
+                                    <p class="text-muted">请先进行图谱分析</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p id="loadingText">处理中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
