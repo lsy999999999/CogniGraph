@@ -459,7 +459,19 @@ function showLoading(text) {
 
 function hideLoading() {
     if (loadingModal && typeof loadingModal.hide === 'function') {
-        loadingModal.hide();
+        // 使用setTimeout确保在动画完成后隐藏
+        setTimeout(() => {
+            loadingModal.hide();
+            // 强制移除backdrop
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            // 恢复body滚动
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        }, 100);
     } else {
         console.error('Loading modal not initialized');
     }
