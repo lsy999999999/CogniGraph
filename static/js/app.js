@@ -73,7 +73,9 @@ async function uploadFile() {
             body: formData
         });
 
+        console.log('Upload response status:', response.status);
         const data = await response.json();
+        console.log('Upload response data:', data);
 
         if (data.success) {
             state.filename = data.filename;
@@ -83,8 +85,10 @@ async function uploadFile() {
             showStatus('uploadStatus', `上传失败: ${data.error}`, 'error');
         }
     } catch (error) {
+        console.error('Upload error:', error);
         showStatus('uploadStatus', `上传失败: ${error.message}`, 'error');
     } finally {
+        console.log('Hiding loading modal');
         hideLoading();
     }
 }
@@ -440,10 +444,21 @@ function showStatus(elementId, message, type) {
 }
 
 function showLoading(text) {
-    document.getElementById('loadingText').innerHTML = text;
-    loadingModal.show();
+    const loadingText = document.getElementById('loadingText');
+    if (loadingText) {
+        loadingText.innerHTML = text;
+    }
+    if (loadingModal && typeof loadingModal.show === 'function') {
+        loadingModal.show();
+    } else {
+        console.error('Loading modal not initialized');
+    }
 }
 
 function hideLoading() {
-    loadingModal.hide();
+    if (loadingModal && typeof loadingModal.hide === 'function') {
+        loadingModal.hide();
+    } else {
+        console.error('Loading modal not initialized');
+    }
 }
