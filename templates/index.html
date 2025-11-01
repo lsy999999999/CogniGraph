@@ -36,7 +36,8 @@
                                 <span class="step-number">1</span> 上传文本文件
                             </h6>
                             <div class="mb-3">
-                                <input type="file" class="form-control" id="fileInput" accept=".txt">
+                                <label for="fileInput" class="form-label">选择文本文件</label>
+                                <input type="file" class="form-control" id="fileInput" accept=".txt" aria-label="选择文本文件">
                                 <small class="text-muted">支持 .txt 格式</small>
                             </div>
                             <button class="btn btn-primary w-100" id="uploadBtn" disabled>
@@ -67,8 +68,8 @@
                             </h6>
 
                             <div class="mb-3">
-                                <label class="form-label">可视化类型</label>
-                                <select class="form-select" id="vizType" disabled>
+                                <label for="vizType" class="form-label">可视化类型</label>
+                                <select class="form-select" id="vizType" disabled aria-label="选择可视化类型">
                                     <option value="interactive_2d">交互式2D图谱</option>
                                     <option value="interactive_3d">交互式3D图谱</option>
                                     <option value="heatmap">语义相似度热力图</option>
@@ -77,8 +78,8 @@
                             </div>
 
                             <div class="mb-3" id="layoutOptions">
-                                <label class="form-label">布局算法</label>
-                                <select class="form-select" id="layoutType">
+                                <label for="layoutType" class="form-label">布局算法</label>
+                                <select class="form-select" id="layoutType" aria-label="选择布局算法">
                                     <option value="semantic">语义布局(词向量)</option>
                                     <option value="spring">力导向布局</option>
                                     <option value="circular">环形布局</option>
@@ -142,17 +143,17 @@
                 <!-- Tab导航 -->
                 <ul class="nav nav-tabs" id="mainTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="viz-tab" data-bs-toggle="tab" data-bs-target="#vizPanel" type="button">
+                        <button class="nav-link active" id="viz-tab" data-bs-toggle="tab" data-bs-target="#vizPanel" type="button" role="tab" aria-controls="vizPanel" aria-selected="true">
                             <i class="bi bi-diagram-3"></i> 可视化
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#infoPanel" type="button">
+                        <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#infoPanel" type="button" role="tab" aria-controls="infoPanel" aria-selected="false">
                             <i class="bi bi-info-circle"></i> 图谱信息
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analyticsPanel" type="button">
+                        <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analyticsPanel" type="button" role="tab" aria-controls="analyticsPanel" aria-selected="false">
                             <i class="bi bi-graph-up"></i> 分析结果
                         </button>
                     </li>
@@ -160,7 +161,7 @@
 
                 <div class="tab-content" id="mainTabContent">
                     <!-- 可视化面板 -->
-                    <div class="tab-pane fade show active" id="vizPanel" role="tabpanel">
+                    <div class="tab-pane fade show active" id="vizPanel" role="tabpanel" aria-labelledby="viz-tab">
                         <div class="card">
                             <div class="card-body">
                                 <div id="visualizationContainer" class="text-center p-5">
@@ -172,7 +173,7 @@
                     </div>
 
                     <!-- 图谱信息面板 -->
-                    <div class="tab-pane fade" id="infoPanel" role="tabpanel">
+                    <div class="tab-pane fade" id="infoPanel" role="tabpanel" aria-labelledby="info-tab">
                         <div class="card">
                             <div class="card-body">
                                 <div id="infoContainer">
@@ -183,7 +184,7 @@
                     </div>
 
                     <!-- 分析结果面板 -->
-                    <div class="tab-pane fade" id="analyticsPanel" role="tabpanel">
+                    <div class="tab-pane fade" id="analyticsPanel" role="tabpanel" aria-labelledby="analytics-tab">
                         <div class="card">
                             <div class="card-body">
                                 <div id="analyticsContainer">
