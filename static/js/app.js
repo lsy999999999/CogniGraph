@@ -27,7 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupEventListeners() {
     // 文件选择
     fileInput.addEventListener('change', () => {
+        console.log('File selected:', fileInput.files[0]?.name);
         uploadBtn.disabled = !fileInput.files.length;
+        console.log('Upload button disabled:', uploadBtn.disabled);
     });
 
     // 上传文件
