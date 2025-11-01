@@ -6,17 +6,20 @@ let state = {
 };
 
 // DOM元素
-const fileInput = document.getElementById('fileInput');
-const uploadBtn = document.getElementById('uploadBtn');
-const buildBtn = document.getElementById('buildBtn');
-const visualizeBtn = document.getElementById('visualizeBtn');
-const analyzeBtn = document.getElementById('analyzeBtn');
-const vizType = document.getElementById('vizType');
-const layoutType = document.getElementById('layoutType');
-const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+let fileInput, uploadBtn, buildBtn, visualizeBtn, analyzeBtn, vizType, layoutType, loadingModal;
 
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
+    // 初始化DOM元素
+    fileInput = document.getElementById('fileInput');
+    uploadBtn = document.getElementById('uploadBtn');
+    buildBtn = document.getElementById('buildBtn');
+    visualizeBtn = document.getElementById('visualizeBtn');
+    analyzeBtn = document.getElementById('analyzeBtn');
+    vizType = document.getElementById('vizType');
+    layoutType = document.getElementById('layoutType');
+    loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+
     setupEventListeners();
     updateVizTypeOptions();
 });

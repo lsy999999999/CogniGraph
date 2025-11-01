@@ -47,9 +47,18 @@ def upload_file():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
-            # 读取文本内容
-            with open(filepath, 'r', encoding='utf-8') as f:
-                text = f.read()
+            # 读取文本内容，尝试多种编码
+            text = None
+            for encoding in ['utf-8', 'gbk', 'gb2312', 'utf-8-sig']:
+                try:
+                    with open(filepath, 'r', encoding=encoding) as f:
+                        text = f.read()
+                    break
+                except UnicodeDecodeError:
+                    continue
+
+            if text is None:
+                return jsonify({'error': '无法读取文件，请确保文件为文本格式'}), 400
 
             return jsonify({
                 'success': True,
@@ -61,6 +70,9 @@ def upload_file():
             return jsonify({'error': '不支持的文件类型'}), 400
 
     except Exception as e:
+        print(f"Upload error: {str(e)}")  # 添加服务器日志
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': f'上传失败: {str(e)}'}), 500
 
 @app.route('/api/build_graph', methods=['POST'])
