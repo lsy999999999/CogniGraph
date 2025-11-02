@@ -6,7 +6,7 @@ let state = {
 };
 
 // DOM元素
-let fileInput, uploadBtn, buildBtn, visualizeBtn, analyzeBtn, vizType, layoutType, loadingModal;
+let fileInput, uploadBtn, buildBtn, visualizeBtn, analyzeBtn, vizType, layoutType;
 
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     analyzeBtn = document.getElementById('analyzeBtn');
     vizType = document.getElementById('vizType');
     layoutType = document.getElementById('layoutType');
-    loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    // 不再使用Bootstrap Modal实例
 
     setupEventListeners();
     updateVizTypeOptions();
@@ -446,33 +446,67 @@ function showStatus(elementId, message, type) {
 }
 
 function showLoading(text) {
+    console.log('showLoading called with text:', text);
+    const modalEl = document.getElementById('loadingModal');
     const loadingText = document.getElementById('loadingText');
+
+    if (!modalEl) {
+        console.error('Modal element not found');
+        return;
+    }
+
     if (loadingText) {
         loadingText.innerHTML = text;
     }
-    if (loadingModal && typeof loadingModal.show === 'function') {
-        loadingModal.show();
-    } else {
-        console.error('Loading modal not initialized');
+
+    // 完全使用原生DOM操作，不用Bootstrap
+    modalEl.style.display = 'block';
+    modalEl.classList.add('show');
+    modalEl.setAttribute('aria-modal', 'true');
+    modalEl.setAttribute('role', 'dialog');
+    modalEl.removeAttribute('aria-hidden');
+
+    // 添加backdrop
+    let backdrop = document.querySelector('.modal-backdrop');
+    if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        document.body.appendChild(backdrop);
     }
+
+    // 阻止body滚动
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+
+    console.log('Modal shown');
 }
 
 function hideLoading() {
-    if (loadingModal && typeof loadingModal.hide === 'function') {
-        // 使用setTimeout确保在动画完成后隐藏
-        setTimeout(() => {
-            loadingModal.hide();
-            // 强制移除backdrop
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-                backdrop.remove();
-            }
-            // 恢复body滚动
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-        }, 100);
-    } else {
-        console.error('Loading modal not initialized');
+    console.log('hideLoading called');
+    const modalEl = document.getElementById('loadingModal');
+
+    if (!modalEl) {
+        console.error('Modal element not found');
+        return;
     }
+
+    // 完全使用原生DOM操作
+    modalEl.style.display = 'none';
+    modalEl.classList.remove('show');
+    modalEl.setAttribute('aria-hidden', 'true');
+    modalEl.removeAttribute('aria-modal');
+    modalEl.removeAttribute('role');
+
+    // 移除所有backdrop
+    document.querySelectorAll('.modal-backdrop').forEach(el => {
+        console.log('Removing backdrop');
+        el.remove();
+    });
+
+    // 恢复body状态
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+
+    console.log('Modal hidden');
 }

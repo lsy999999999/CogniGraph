@@ -1,4 +1,4 @@
-from litellm import completion
+from openai import OpenAI
 import json
 from dotenv import load_dotenv
 import os
@@ -12,6 +12,12 @@ class KnowledgeGraphBuilder:
         self.api_key = os.getenv('DEEPSEEK_API_KEY')
         if not self.api_key:
             raise ValueError("请配置 DEEPSEEK_API_KEY 环境变量")
+
+        # 初始化DeepSeek客户端（使用OpenAI SDK，因为API兼容）
+        self.client = OpenAI(
+            api_key=self.api_key,
+            base_url="https://api.deepseek.com"
+        )
 
     def build(self, text):
         """
@@ -46,48 +52,14 @@ class KnowledgeGraphBuilder:
         """
 
         try:
-            response = completion(
-                model="deepseek/deepseek-chat",
+            response = self.client.chat.completions.create(
+                model="deepseek-chat",
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": text}
                 ],
-                response_format={"type": "json_object", "json_schema": {
-                    "name": "knowledge_graph",
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "theme": {"type": "string"},
-                            "title": {"type": "string"},
-                            "abstract": {"type": "string"},
-                            "aspects": {"type": "array", "items": {"type": "string"}},
-                            "reader": {"type": "string"},
-                            "purpose": {"type": "string"},
-                            "purposes": {"type": "array", "items": {"type": "string"}},
-                            "nodes": {"type": "array", "items": {
-                                "type": "object",
-                                "properties": {
-                                    "id": {"type": "integer"},
-                                    "name": {"type": "string"},
-                                    "type": {"type": "string"},
-                                    "description": {"type": "string"}
-                                },
-                                "required": ["id", "name", "type"]
-                            }},
-                            "edges": {"type": "array", "items": {
-                                "type": "object",
-                                "properties": {
-                                    "source": {"type": "integer"},
-                                    "target": {"type": "integer"},
-                                    "relation": {"type": "string"},
-                                    "weight": {"type": "number"}
-                                },
-                                "required": ["source", "target", "relation"]
-                            }}
-                        },
-                        "required": ["theme", "title", "nodes", "edges"]
-                    }
-                }}
+                timeout=120,  # 设置120秒超时
+                response_format={"type": "json_object"}
             )
 
             result = response.choices[0].message.content
